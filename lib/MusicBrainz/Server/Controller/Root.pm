@@ -226,14 +226,18 @@ sub begin : Private
         my $store = $c->model('MB')->context->store;
 
         if ($c->user_exists) {
-            my $ip_md5 = md5_hex($c->req->address);
-            my $user_id = $c->user->id;
+            if (!$c->stash->{server_details}->{staging_server} ||
+                !$c->stash->{server_details}->{is_sanitized})
+            {
+                my $ip_md5 = md5_hex($c->req->address);
+                my $user_id = $c->user->id;
 
-            $store->set_add("ipusers:$ip_md5", $user_id);
-            $store->expire("ipusers:$ip_md5", $IP_STORE_EXPIRES);
+                $store->set_add("ipusers:$ip_md5", $user_id);
+                $store->expire("ipusers:$ip_md5", $IP_STORE_EXPIRES);
 
-            $store->set_add("userips:$user_id", $ip_md5);
-            $store->expire("userips:$user_id", $IP_STORE_EXPIRES);
+                $store->set_add("userips:$user_id", $ip_md5);
+                $store->expire("userips:$user_id", $IP_STORE_EXPIRES);
+            }
 
             if ($c->action->name ne 'notes_received') {
                 my $user_name = $c->user->name;
