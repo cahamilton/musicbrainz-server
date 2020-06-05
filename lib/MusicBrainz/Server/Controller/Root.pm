@@ -226,8 +226,8 @@ sub begin : Private
         my $store = $c->model('MB')->context->store;
 
         if ($c->user_exists) {
-            if (!$c->stash->{server_details}->{staging_server} ||
-                !$c->stash->{server_details}->{is_sanitized})
+            if (!DBDefs->DB_STAGING_SERVER ||
+                !DBDefs->DB_STAGING_SERVER_SANITIZED)
             {
                 my $ip_md5 = md5_hex($c->req->address);
                 my $user_id = $c->user->id;
